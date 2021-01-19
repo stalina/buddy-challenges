@@ -40,22 +40,11 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Vue } from 'vue-class-component';
 
-@Options({
-  props: { 
-    size:{
-            type: Number,
-            required: true
-        }
-  }
-})
 export default class LightSaber extends Vue {
-    size=0
-    get laserStyle() {
-        const height = this.size * 50
-        return { height: height + 'px' }
-    }
+    count=0
+    laserStyle={ height: '0px' }
 
     hasDeviceMotion = false
     lastTime = new Date()
@@ -82,11 +71,11 @@ export default class LightSaber extends Vue {
     }
 
     start() {
-            this.reset();
-            if (this.hasDeviceMotion) {
-                window.addEventListener('devicemotion', this.devicemotion, false);
-            }
+        this.reset();
+        if (this.hasDeviceMotion) {
+            window.addEventListener('devicemotion', this.devicemotion, false);
         }
+    }
 
     reset() {
         this.lastTime = new Date();
@@ -96,49 +85,57 @@ export default class LightSaber extends Vue {
     }
 
     devicemotion(e: DeviceMotionEvent) {
-            let currentTime;
-            let timeDifference;
-            let deltaX = 0;
-            let deltaY = 0;
-            let deltaZ = 0;
-            const current = e.accelerationIncludingGravity? 
-            {x:e.accelerationIncludingGravity.x||0, y:e.accelerationIncludingGravity.y||0, z:e.accelerationIncludingGravity.z||0}:{x:0, y:0, z:0}
+        let currentTime;
+        let timeDifference;
+        let deltaX = 0;
+        let deltaY = 0;
+        let deltaZ = 0;
+        const current = e.accelerationIncludingGravity? 
+        {x:e.accelerationIncludingGravity.x||0, y:e.accelerationIncludingGravity.y||0, z:e.accelerationIncludingGravity.z||0}:{x:0, y:0, z:0}
 
 
-            if (this.lastX === null || this.lastY === null || this.lastZ === null) {
-                this.lastX = current.x;
-                this.lastY = current.y;
-                this.lastZ = current.z;
-                return;
-            }
-
-            deltaX = Math.abs(this.lastX||0 - current.x);
-            deltaY = Math.abs(this.lastY||0 - current.y);
-            deltaZ = Math.abs(this.lastZ||0 - current.z);
-
-            if (((deltaX > this.options.threshold) && (deltaY > this.options.threshold)) || ((deltaX > this.options.threshold) && (deltaZ > this.options.threshold)) || ((deltaY > this.options.threshold) && (deltaZ > this.options.threshold))) {
-                //calculate time in milliseconds since last shake registered
-                currentTime = new Date();
-                timeDifference = currentTime.getTime() - this.lastTime.getTime();
-
-                if (timeDifference > this.options.timeout) {
-                    this.shakeIt();
-                    this.lastTime = new Date();
-                }
-            }
-
+        if (this.lastX === null || this.lastY === null || this.lastZ === null) {
             this.lastX = current.x;
             this.lastY = current.y;
             this.lastZ = current.z;
-
+            return;
         }
 
-        shakeIt(){
-        this.size++;
+        deltaX = Math.abs(this.lastX||0 - current.x);
+        deltaY = Math.abs(this.lastY||0 - current.y);
+        deltaZ = Math.abs(this.lastZ||0 - current.z);
+
+        if (((deltaX > this.options.threshold) && (deltaY > this.options.threshold)) || ((deltaX > this.options.threshold) && (deltaZ > this.options.threshold)) || ((deltaY > this.options.threshold) && (deltaZ > this.options.threshold))) {
+            //calculate time in milliseconds since last shake registered
+            currentTime = new Date();
+            timeDifference = currentTime.getTime() - this.lastTime.getTime();
+
+            if (timeDifference > this.options.timeout) {
+                this.shakeIt();
+                this.lastTime = new Date();
+            }
         }
-          increment(){
-            this.shakeIt();
+
+        this.lastX = current.x;
+        this.lastY = current.y;
+        this.lastZ = current.z;
+
+    }
+
+    shakeIt(){
+        this.count++;
+        
+        const elt = document.getElementById('generator');
+        if(elt){
+            const maxHeight = elt.getBoundingClientRect().top;
+            const height = (this.count>100?1:this.count/100) * maxHeight
+            this.laserStyle = { height: height + 'px' }
         }
+    }
+    
+    increment(){
+        this.shakeIt();
+    }
 
 }
 </script>
@@ -152,7 +149,8 @@ export default class LightSaber extends Vue {
     text-align:center;
     position: fixed;
     bottom: 0;
-    right: 50%;
+    left: 0;
+    right: 0;
 }
 #lightsaber span { display:inline-block; }
 
