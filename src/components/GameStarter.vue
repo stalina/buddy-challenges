@@ -6,7 +6,7 @@
 		<slot></slot>
 		<button class="overlay-close" @click="state='countdown'">I am ready !</button>
 	</div>
-	<CountDown :start="state==='countdown'" :timer="3" @is-over="state='started'"></CountDown>
+	<CountDown :start="state==='countdown'" :timer="3" @is-over="gameStarted()"></CountDown>
 	<div class="started" v-if="state==='started'">Go !!!</div>
 </div>
 
@@ -23,11 +23,17 @@ import CountDown from '@/components/CountDown.vue';
   },
   props: {
     isOpen: Boolean
-  }
+  },
+  emits: ['gameStarted']
 })
 export default class GameStarter extends Vue {
 	isOpen=false;
 	state='instruction';
+
+	gameStarted(){
+		this.state='started'
+		this.$emit('gameStarted');
+	}
 }
 </script>
 
