@@ -1,23 +1,42 @@
 <template>
 <div class="counter">
 	<div class="nums">
-    <transition name="rotate" @after-enter="count = (count>0?count-1:0)">
-		<span class="start" v-if="count>=0" :key="count">{{count}}</span>
+    <transition name="rotate" @after-enter="nextCount()">
+		<span class="start" v-if="count>0" :key="count">{{count}}</span>
     </transition>
 	</div>
-	<h4>Get Ready</h4>
-  <button @click="count = count-1">Toggle count</button>
 </div>
 
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-class-component';
+import { Vue,Options } from 'vue-class-component';
 
+@Options({
+  props: {
+	start: Boolean,
+	timer: Number
+  },
+  watch: {
+    start() {
+		if(this.start){
+		this.count = this.timer;
+		}
+    }
+  },
+  emits: ['isOver']
+})
 export default class CountDown extends Vue {
+	start=false;
+	timer=10;
+	count=0;
 
-show=true;
-count=10;
+	nextCount(){
+		this.count = (this.count>0?this.count-1:0)
+		if(this.count<=0){
+			this.$emit('isOver')
+		}
+	}
 }
 </script>
 
@@ -64,11 +83,9 @@ count=10;
 	30% {
 		transform: translate(-50%, -50%) rotate(-20deg);
 	}
-
 	60% {
 		transform: translate(-50%, -50%) rotate(10deg);
 	}
-
 	90%, 100% {
 		transform: translate(-50%, -50%) rotate(0deg);
 	}
@@ -86,11 +103,5 @@ count=10;
 	100% {
 		transform: translate(-50%, -50%) rotate(-120deg);
 	}
-}
-
-h4 {
-	font-size: 20px;
-	margin: 5px;
-	text-transform: uppercase;
 }
 </style>
