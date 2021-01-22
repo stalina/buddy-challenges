@@ -40,13 +40,18 @@
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-class-component';
+import { Options, Vue } from 'vue-class-component';
 
+@Options({
+    props :{
+        isSaberActive: Boolean
+    }
+})
 export default class LightSaber extends Vue {
     count=0
+    isSaberActive=false;
     laserStyle={ height: '0px' }
 
-    hasDeviceMotion = false
     lastTime = new Date()
     lastX: number|null = null
     lastY: number|null = null
@@ -58,12 +63,7 @@ export default class LightSaber extends Vue {
 
     created() {
         console.log('created light');
-        this.hasDeviceMotion = 'ondevicemotion' in window;
-        if(!this.hasDeviceMotion){
-        console.log('not supported');
-        }else {
         this.start();
-        }
     }
 
     unmounted() {
@@ -72,7 +72,8 @@ export default class LightSaber extends Vue {
 
     start() {
         this.reset();
-        if (this.hasDeviceMotion) {
+         const hasDeviceMotion = 'ondevicemotion' in window;
+        if (hasDeviceMotion) {
             window.addEventListener('devicemotion', this.devicemotion, false);
         }
     }
@@ -119,17 +120,18 @@ export default class LightSaber extends Vue {
         this.lastX = current.x;
         this.lastY = current.y;
         this.lastZ = current.z;
-
     }
 
     shakeIt(){
-        this.count++;
-        
-        const elt = document.getElementById('generator');
-        if(elt){
-            const maxHeight = elt.getBoundingClientRect().top;
-            const height = (this.count>100?1:this.count/100) * maxHeight
-            this.laserStyle = { height: height + 'px' }
+        if(this.isSaberActive){
+            this.count++;
+            
+            const elt = document.getElementById('generator');
+            if(elt){
+                const maxHeight = elt.getBoundingClientRect().top;
+                const height = (this.count>100?1:this.count/100) * maxHeight
+                this.laserStyle = { height: height + 'px' }
+            }
         }
     }
     
