@@ -1,7 +1,7 @@
 <template>
 <div id="lightsaber">
     <span id="light" v-bind:style="laserStyle"></span>
-    <span id="generator" @click="increment">
+    <span id="generator" @click="shakeIt">
         <span id="guard">
             <span></span>
             <span></span>
@@ -40,7 +40,9 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
+import { Options, Vue, setup } from 'vue-class-component';
+
+import {useScore} from '@/composables/useScore'; 
 
 @Options({
     props :{
@@ -48,7 +50,14 @@ import { Options, Vue } from 'vue-class-component';
     }
 })
 export default class LightSaber extends Vue {
-    count=0
+    scoreContext = setup(() => {
+        const {score, incrementScore} = useScore();
+
+        return {
+            score,
+            incrementScore
+        };
+    })
     isSaberActive=false;
     laserStyle={ height: '0px' }
 
@@ -62,7 +71,7 @@ export default class LightSaber extends Vue {
             };
 
     created() {
-        console.log('created light');
+        console.log('created light : '+ this.scoreContext.score);
         this.start();
     }
 
@@ -72,7 +81,7 @@ export default class LightSaber extends Vue {
 
     start() {
         this.reset();
-         const hasDeviceMotion = 'ondevicemotion' in window;
+        const hasDeviceMotion = 'ondevicemotion' in window;
         if (hasDeviceMotion) {
             window.addEventListener('devicemotion', this.devicemotion, false);
         }
@@ -124,19 +133,17 @@ export default class LightSaber extends Vue {
 
     shakeIt(){
         if(this.isSaberActive){
-            this.count++;
+            this.scoreContext.incrementScore();
+        console.log('created light : '+ this.scoreContext.score);
             
             const elt = document.getElementById('generator');
             if(elt){
+                const score: number = this.scoreContext.score;
                 const maxHeight = elt.getBoundingClientRect().top;
-                const height = (this.count>100?1:this.count/100) * maxHeight
+                const height = (score>100?1:score/100) * maxHeight
                 this.laserStyle = { height: height + 'px' }
             }
         }
-    }
-    
-    increment(){
-        this.shakeIt();
     }
 
 }
