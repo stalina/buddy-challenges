@@ -7,24 +7,32 @@
       <p> if your device does not support shaking, alternatively, you can click on the saber handle</p>
     </GameStarter>
     <CountDown :start="gameStarted" :timer="10" @is-over="gameOver()"></CountDown>
+    <ScoreBoard v-if="!openStarter && !gameStarted"></ScoreBoard>
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
+
 import LightSaber from '@/components/LightSaber.vue'; 
 import GameStarter from '@/components/GameStarter.vue'; 
 import CountDown from '@/components/CountDown.vue'; 
+import ScoreBoard from '@/components/ScoreBoard.vue'; 
+
+import {initScoreProvider} from '@/composables/useScore'; 
 
 @Options({
   components: {
-    LightSaber, GameStarter, CountDown
+    LightSaber, GameStarter, CountDown, ScoreBoard
   }
 })
 export default class ShakerGame extends Vue {
-
   openStarter = false;
   gameStarted = false;
+
+  beforeCreate(){
+    initScoreProvider()
+  }
 
   mounted(){
     this.openStarter=true;

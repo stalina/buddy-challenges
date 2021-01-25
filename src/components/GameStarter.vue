@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Options } from 'vue-class-component';
+import { Vue, Options  } from 'vue-class-component';
 import CountDown from '@/components/CountDown.vue'; 
 @Options({
   components: {
