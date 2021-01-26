@@ -10,7 +10,7 @@
     <div class="avatar"></div>
     <div class="text">
       <h2>
-        Your name 
+        {{scoreContext.name}}
       </h2>
       <p>
         And a few words too.
@@ -30,6 +30,7 @@
 import { Options, Vue, setup } from 'vue-class-component';
 
 import {useScore} from '@/composables/useScore'; 
+import {playerStore} from '@/store/playerStore';
 
 @Options({
 
@@ -37,8 +38,10 @@ import {useScore} from '@/composables/useScore';
 export default class ScoreBoard extends Vue {
   scoreContext = setup(() => {
         const {score} = useScore();
+        const name = playerStore.getPlayer().name;
 
         return {
+            name,
             score
         };
     })
